@@ -1,0 +1,13 @@
+[Unit]
+Description=cexfy service
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/cexfy
+ExecStart=/usr/bin/python3 /opt/cexfy/app.py
+Environment="CEXFY_DOMAIN=panel.example.com"
+Restart=always
+User=cexfy
+
+[Install]
+WantedBy=multi-user.target
