@@ -24,7 +24,16 @@ sudo mkdir -p "$INSTALL_DIR"
 sudo cp -r ./* "$INSTALL_DIR/"
 sudo chown -R cexfy:cexfy "$INSTALL_DIR"
 
-# 4. Create systemd service file
+# 4. Create virtual environment
+echo "Creating virtual environment..."
+sudo -u cexfy python3 -m venv "$INSTALL_DIR/venv"
+
+# 5. Install Python dependencies
+echo "Installing Python dependencies..."
+sudo -u cexfy "$INSTALL_DIR/venv/bin/pip" install --upgrade pip
+sudo -u cexfy "$INSTALL_DIR/venv/bin/pip" install -r "$INSTALL_DIR/requirements.txt"
+
+# 6. Create systemd service
 SERVICE_FILE="/etc/systemd/system/cexfy.service"
 sudo tee "$SERVICE_FILE" > /dev/null <<EOF
 [Unit]
@@ -33,7 +42,7 @@ After=network.target
 
 [Service]
 WorkingDirectory=$INSTALL_DIR
-ExecStart=/usr/bin/python3 $INSTALL_DIR/app.py
+ExecStart=$INSTALL_DIR/venv/bin/python $INSTALL_DIR/app.py
 Environment="CEXFY_DOMAIN=$CEXFY_DOMAIN"
 Restart=always
 User=cexfy
@@ -42,7 +51,7 @@ User=cexfy
 WantedBy=multi-user.target
 EOF
 
-# 5. Reload systemd and enable service
+# 7. Enable and start service
 sudo systemctl daemon-reload
 sudo systemctl enable --now cexfy
 
