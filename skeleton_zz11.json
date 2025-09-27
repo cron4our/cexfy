@@ -1,0 +1,326 @@
+{
+  "log": {
+    "level": "trace"
+  },
+  "experimental": {
+  "clash_api": {
+    "external_controller": "127.0.0.1:20123",
+    "secret": "uuulejwu-qzm1-kq96-0aps-gcxha7ia261r",
+    "external_ui": "",
+    "external_ui_download_url": "",
+    "external_ui_download_detour": "🎯 Direct"
+  }
+},
+  "inbounds": [
+    {
+      "type": "tun",
+      "tag": "tun-in",
+      "interface_name": "sing-tun0",
+      "address": ["172.19.0.1/30"],
+      "auto_route": true,
+      "strict_route": true,
+      "stack": "gvisor" // Optional
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "selector",
+      "tag": "🚀 Select",
+      "interrupt_exist_connections": false,
+      "outbounds": [
+        "🎈 Auto",
+        "__OUTBOUND_TAGS__"
+      ]
+    },
+    {
+      "type": "urltest",
+      "tag": "🎈 Auto",
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "3m",
+      "tolerance": 150,
+      "interrupt_exist_connections": false,
+      "outbounds": [
+        "__OUTBOUND_TAGS__"
+      ]
+    },
+    {
+      "type": "direct",
+      "tag": "🎯 Direct"
+    },
+    {
+      "type": "block",
+      "tag": "🚫 Block"
+    },
+    {
+      "type": "selector",
+      "tag": "⚡ BitTorrent",
+      "outbounds": [
+        "🚫 Block",
+        "🎯 Direct"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "3️⃣ QUIC",
+      "outbounds": [
+        "🚫 Block",
+        "🚀 Select"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "🐟 Fallback",
+      "interrupt_exist_connections": true,
+      "outbounds": [
+        "🚀 Select",
+        "🎯 Direct"
+      ]
+    },
+    {
+      "type": "selector",
+      "tag": "~download_route",
+      "interrupt_exist_connections": false,
+      "outbounds": [
+        "__IP_OUTBOUND__"
+      ]
+    },
+    "__HIDDIFY_OUTBOUNDS__"
+  ],
+  "route": {
+    "rules": [
+      {
+        "inbound": "tun-in",
+        "action": "sniff",
+        "timeout": "200ms"
+      },
+      {
+        "action": "hijack-dns",
+        "protocol": "dns"
+      },
+      {
+        "inbound": "tun-in",
+        "action": "resolve",
+        "strategy": "prefer_ipv4"
+      },
+      {
+        "action": "route",
+        "clash_mode": "direct",
+        "outbound": "🎯 Direct"
+      },
+      {
+        "action": "route",
+        "clash_mode": "global",
+        "outbound": "🚀 Select"
+        // "outbound": "GLOBAL"
+      },
+      // Torrents
+      {
+        "action": "route",
+        "protocol": "bittorrent",
+        "outbound": "⚡ BitTorrent"
+      },
+      {
+        "action": "route",
+        "protocol": "quic",
+        "outbound": "3️⃣ QUIC"
+      },
+      // Ads
+      {
+        "action": "reject",
+        "rule_set": "geosite-category-ads-all"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "geosite-private"
+        ],
+        "outbound": "🎯 Direct"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "geoip-private"
+        ],
+        // "ip_is_private": true,
+        "outbound": "🎯 Direct"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "geosite-ru-blocked",
+          "geoip-ru-blocked-community"
+        ],
+        "outbound": "🚀 Select"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "geosite-category-ru",
+          "geoip-ru"
+        ],
+        "outbound": "🎯 Direct"
+      }
+    ],
+    "rule_set": [
+      {
+        "tag": "geoip-private",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/runetfreedom/russia-v2ray-rules-dat/release/sing-box/rule-set-geoip/geoip-private.srs",
+        "download_detour": "~download_route"
+      },
+      {
+        "tag": "geoip-ru",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/runetfreedom/russia-v2ray-rules-dat/release/sing-box/rule-set-geoip/geoip-ru.srs",
+        "download_detour": "~download_route"
+      },
+      {
+        "tag": "geoip-ru-blocked-community",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/runetfreedom/russia-v2ray-rules-dat/release/sing-box/rule-set-geoip/geoip-ru-blocked-community.srs",
+        "download_detour": "~download_route"
+      },
+      {
+        "tag": "geosite-category-ads-all",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/runetfreedom/russia-v2ray-rules-dat/release/sing-box/rule-set-geosite/geosite-category-ads-all.srs",
+        "download_detour": "~download_route"
+      },
+      {
+        "tag": "geosite-private",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/runetfreedom/russia-v2ray-rules-dat/release/sing-box/rule-set-geosite/geosite-private.srs",
+        "download_detour": "~download_route"
+      },
+      {
+        "tag": "geosite-ru-blocked",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/runetfreedom/russia-v2ray-rules-dat/release/sing-box/rule-set-geosite/geosite-ru-blocked.srs",
+        "download_detour": "~download_route"
+      },
+      {
+        "tag": "geosite-category-ru",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/runetfreedom/russia-v2ray-rules-dat/release/sing-box/rule-set-geosite/geosite-category-ru.srs",
+        "download_detour": "~download_route"
+      }
+    ],
+    "auto_detect_interface": true,
+    "final": "🐟 Fallback"
+    // ,"default_domain_resolver": {
+    //   // "server": "local-bootstrap"
+    //   "server": "remote-bootstrap"
+    // }
+  },
+  "dns": {
+    "servers": [
+      {
+        "tag": "localhost-dns",
+        "address": "local"
+        // "prefer_go": false // Since sing-box v1.13.0
+      },
+      {
+        "tag": "local-dns",
+        // "type": "https", // Since sing-box  v1.12.0
+        "domain_resolver": "local-bootstrap",
+        "server_port": 443,
+        // "path": "/dns-query", // Since sing-box  v1.12.0
+        "server": "https://77.88.8.88/dns-query",
+        "tls": {
+          "enabled": true,
+          "server_name": "safe.dot.dns.yandex.net"
+        }
+      },
+      {
+        "tag": "local-bootstrap",
+        // "type": "https",
+        "server_port": 443,
+        // "path": "/dns-query",
+        // "server": "77.88.8.88",
+        // "tls": {
+        //   "enabled": true,
+        //   "server_name": "safe.dot.dns.yandex.net"
+        // }
+        "server": "https://8.8.8.8/dns-query",
+        "tls": {
+          "enabled": true,
+          "server_name": "dns.google"
+        }
+      },
+      {
+        "tag": "remote-dns",
+        // "type": "https",
+        "detour": "🚀 Select",
+        "domain_resolver": "remote-bootstrap",
+        "server_port": 443,
+        // "path": "/dns-query",
+        "server": "https://dns.adguard-dns.com/dns-query",
+        "tls": {
+          "enabled": true,
+          "server_name": "dns.adguard-dns.com"
+        }
+      },
+      {
+        "tag": "remote-bootstrap",
+        // "type": "udp",
+        "detour": "🚀 Select",
+        "server_port": 53,
+        "server": "8.8.8.8"
+      },
+      {
+        "address": "rcode://success", // or "rcode://refused"
+        "tag": "dns-predefined"
+      }
+    ],
+    "rules": [
+     {
+        "action": "predefined",
+        "rcode": "NOERROR",
+        "domain_regex": [
+          "10\\.in-addr\\.arpa$",
+          "(?:1[6-9]|2[0-9]|3[0-1])\\.172\\.in-addr\\.arpa$",
+          "168\\.192\\.in-addr\\.arpa$",
+          "127\\.in-addr\\.arpa$",
+          "254\\.169\\.in-addr\\.arpa$"
+        ]
+      },
+      {
+        "action": "predefined",
+        "rcode": "NOERROR",
+        "rule_set": "geosite-category-ads-all"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "geosite-private"
+        ],
+        "server": "localhost-dns"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "geosite-ru-blocked"
+        ],
+        "server": "remote-dns"
+      },
+      {
+        "action": "route",
+        "rule_set": [
+          "geosite-category-ru"
+        ],
+        "server": "local-dns"
+      }
+    ],
+    "disable_cache": true,
+    "disable_expire": false,
+    "independent_cache": false,
+    "final": "remote-dns"
+  }
+}

@@ -1,11 +1,31 @@
 import ipaddress
+from pathlib import Path
+from typing import Optional, Union
+
 import json5
 
-SKELETON_FILE = "skeleton.json"
+BASE_DIR = Path(__file__).resolve().parent
+DEFAULT_SKELETON_FILE = BASE_DIR / "skeleton.json"
 
-def apply(hiddify_outbounds, tags):
-    # Load skeleton (JSONC → json5)
-    with open(SKELETON_FILE, "r", encoding="utf-8-sig") as f:
+
+def _resolve_skeleton_path(skeleton_path: Optional[Union[str, Path]]) -> Path:
+    """Resolve a template path relative to the project root."""
+    if skeleton_path is None:
+        candidate = DEFAULT_SKELETON_FILE
+    else:
+        candidate = Path(skeleton_path)
+        if not candidate.is_absolute():
+            candidate = BASE_DIR / candidate
+    if not candidate.exists():
+        raise FileNotFoundError(f"Skeleton template not found: {candidate}")
+    return candidate
+
+
+def apply(hiddify_outbounds, tags, skeleton_path: Optional[Union[str, Path]] = None):
+    template_path = _resolve_skeleton_path(skeleton_path)
+
+    # Load skeleton (JSONC -> json5)
+    with template_path.open("r", encoding="utf-8-sig") as f:
         skel = json5.load(f)
 
     # Determine the first outbound with an IP in the "server" field
@@ -20,7 +40,7 @@ def apply(hiddify_outbounds, tags):
             except ValueError:
                 pass
 
-    # If there is no IP outbound, fallback → first available
+    # If there is no IP outbound, fallback -> first available
     if not ip_outbound_tag and hiddify_outbounds:
         ip_outbound_tag = hiddify_outbounds[0]["tag"]
 
@@ -59,3 +79,4 @@ def apply(hiddify_outbounds, tags):
             return obj
 
     return replace(skel)
+
