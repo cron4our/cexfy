@@ -5,6 +5,13 @@ set -euo pipefail
 
 echo "=== cexfy installation ==="
 
+# 0. Check for python3-venv
+if ! python3 -m venv --help >/dev/null 2>&1; then
+    echo "python3-venv is missing, installing..."
+    sudo apt update
+    sudo apt install -y python3-venv
+fi
+
 # 1. Ask for domain
 read -rp "Enter your Hiddify panel domain (e.g. panel.example.com): " CEXFY_DOMAIN
 if [[ -z "$CEXFY_DOMAIN" ]]; then

@@ -1,8 +1,8 @@
 import hiddify
 import skeleton
 
-def build_config(domain: str, secret: str, user_uuid: str) -> dict:
-    parent = hiddify.fetch_config(domain, secret, user_uuid)
+def build_config(domain: str, secret: str, user_uuid: str, query: str = "") -> dict:
+    parent = hiddify.fetch_config(domain, secret, user_uuid, query)
     outbounds, tags = hiddify.extract_outbounds(parent)
     result = skeleton.apply(outbounds, tags)
     return result

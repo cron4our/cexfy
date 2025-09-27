@@ -1,10 +1,13 @@
 import requests
 
-def fetch_config(domain: str, secret: str, user_uuid: str) -> dict:
+def fetch_config(domain: str, secret: str, user_uuid: str, query: str = "") -> dict:
     """
     Downloads the original full-singbox config from Hiddify
+    query = "asn=unknown" или "asn=xyz&device=android"
     """
-    url = f"https://{domain}/{secret}/{user_uuid}/singbox/?asn=unknown"
+    url = f"https://{domain}/{secret}/{user_uuid}/singbox/"
+    if query:
+        url += f"?{query}"
     r = requests.get(url, timeout=10)
     r.raise_for_status()
     return r.json()
