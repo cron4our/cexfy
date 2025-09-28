@@ -148,7 +148,8 @@
         "action": "route",
         "rule_set": [
           "geosite-ru-blocked",
-          "geoip-ru-blocked-community"
+          "geoip-ru-blocked-community",
+          "geosite-youtube"
         ],
         "outbound": "🚀 Select"
       },
@@ -209,6 +210,13 @@
         "type": "remote",
         "format": "binary",
         "url": "https://raw.githubusercontent.com/runetfreedom/russia-v2ray-rules-dat/release/sing-box/rule-set-geosite/geosite-category-ru.srs",
+        "download_detour": "~download_route"
+      },
+      {
+        "tag": "geosite-youtube",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/Chocolate4U/Iran-sing-box-rules/rule-set/geosite-youtube.srs",
         "download_detour": "~download_route"
       }
     ],
@@ -273,7 +281,7 @@
         "detour": "🚀 Select",
         "server_port": 53,
         "server": "8.8.8.8"
-      },
+      }
       // Deprecated
       // {
       //   "address": "rcode://success", // or "rcode://refused"
@@ -307,7 +315,8 @@
       {
         "action": "route",
         "rule_set": [
-          "geosite-ru-blocked"
+          "geosite-ru-blocked",
+          "geosite-youtube"
         ],
         "server": "remote-dns"
       },

@@ -148,7 +148,8 @@
         "action": "route",
         "rule_set": [
           "geosite-ru-blocked",
-          "geoip-ru-blocked-community"
+          "geoip-ru-blocked-community",
+          "geosite-youtube"
         ],
         "outbound": "🚀 Select"
       },
@@ -210,6 +211,13 @@
         "format": "binary",
         "url": "https://raw.githubusercontent.com/runetfreedom/russia-v2ray-rules-dat/release/sing-box/rule-set-geosite/geosite-category-ru.srs",
         "download_detour": "~download_route"
+      },
+      {
+        "tag": "geosite-youtube",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/Chocolate4U/Iran-sing-box-rules/rule-set/geosite-youtube.srs",
+        "download_detour": "~download_route"
       }
     ],
     "auto_detect_interface": true,
@@ -230,49 +238,34 @@
         "tag": "local-dns",
         // "type": "https", // Since sing-box  v1.12.0
         "address_resolver": "local-bootstrap",
-        "server_port": 443,
         // "path": "/dns-query", // Since sing-box  v1.12.0
-        "server": "https://77.88.8.88/dns-query",
-        "tls": {
-          "enabled": true,
-          "server_name": "safe.dot.dns.yandex.net"
-        }
+        "address": "https://safe.dot.dns.yandex.net/dns-query"
       },
       {
         "tag": "local-bootstrap",
         // "type": "https",
-        "server_port": 443,
         // "path": "/dns-query",
         // "server": "77.88.8.88",
         // "tls": {
         //   "enabled": true,
         //   "server_name": "safe.dot.dns.yandex.net"
         // }
-        "server": "https://8.8.8.8/dns-query",
-        "tls": {
-          "enabled": true,
-          "server_name": "dns.google"
-        }
+        "address": "https://dns.google/dns-query",
+        "address_resolver": "remote-bootstrap"
       },
       {
         "tag": "remote-dns",
         // "type": "https",
         "detour": "🚀 Select",
         "address_resolver": "remote-bootstrap",
-        "server_port": 443,
         // "path": "/dns-query",
-        "server": "https://dns.adguard-dns.com/dns-query",
-        "tls": {
-          "enabled": true,
-          "server_name": "dns.adguard-dns.com"
-        }
+        "address": "https://dns.adguard-dns.com/dns-query"
       },
       {
         "tag": "remote-bootstrap",
         // "type": "udp",
         "detour": "🚀 Select",
-        "server_port": 53,
-        "server": "8.8.8.8"
+        "address": "8.8.8.8"
       },
       {
         "address": "rcode://success", // or "rcode://refused"
@@ -306,7 +299,8 @@
       {
         "action": "route",
         "rule_set": [
-          "geosite-ru-blocked"
+          "geosite-ru-blocked",
+          "geosite-youtube"
         ],
         "server": "remote-dns"
       },
