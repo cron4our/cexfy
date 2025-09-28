@@ -214,7 +214,7 @@
     ],
     "auto_detect_interface": true,
     "final": "🐟 Fallback"
-    // ,"default_domain_resolver": {
+    // ,"default_domanin_resolver": {
     //   // "server": "local-bootstrap"
     //   "server": "remote-bootstrap"
     // }
@@ -229,7 +229,7 @@
       {
         "tag": "local-dns",
         // "type": "https", // Since sing-box  v1.12.0
-        "domain_resolver": "local-bootstrap",
+        "address_resolver": "local-bootstrap",
         "server_port": 443,
         // "path": "/dns-query", // Since sing-box  v1.12.0
         "server": "https://77.88.8.88/dns-query",
@@ -258,7 +258,7 @@
         "tag": "remote-dns",
         // "type": "https",
         "detour": "🚀 Select",
-        "domain_resolver": "remote-bootstrap",
+        "address_resolver": "remote-bootstrap",
         "server_port": 443,
         // "path": "/dns-query",
         "server": "https://dns.adguard-dns.com/dns-query",
@@ -281,8 +281,8 @@
     ],
     "rules": [
      {
-        "action": "predefined",
-        "rcode": "NOERROR",
+        "action": "route",
+        "server": "dns-predefined",
         "domain_regex": [
           "10\\.in-addr\\.arpa$",
           "(?:1[6-9]|2[0-9]|3[0-1])\\.172\\.in-addr\\.arpa$",
@@ -292,8 +292,8 @@
         ]
       },
       {
-        "action": "predefined",
-        "rcode": "NOERROR",
+        "action": "route",
+        "server": "dns-predefined",
         "rule_set": "geosite-category-ads-all"
       },
       {
