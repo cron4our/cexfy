@@ -2,6 +2,7 @@ import os
 import json
 
 from flask import Flask, Response, abort, request
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from builder import build_config
 
@@ -26,6 +27,9 @@ TEMPLATE_MAP = {
 
 app = Flask(__name__)
 app.config["JSON_SORT_KEYS"] = False
+
+# Trust the reverse proxy (Nginx) for the originating request data.
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
 
 @app.route("/<template>/<secret>/<uuid:user_uuid>/singbox/")

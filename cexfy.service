@@ -4,7 +4,8 @@ After=network.target
 
 [Service]
 WorkingDirectory=/opt/cexfy
-ExecStart=/usr/bin/python3 /opt/cexfy/app.py
+ExecStart=/opt/cexfy/venv/bin/gunicorn --bind 127.0.0.1:9100 --workers 3 --timeout 60 --forwarded-allow-ips=127.0.0.1 app:app
+ExecReload=/bin/kill -s HUP $MAINPID
 Environment="CEXFY_DOMAIN=panel.example.com"
 Restart=always
 User=cexfy
