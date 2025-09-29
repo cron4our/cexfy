@@ -48,8 +48,8 @@ sudo -u cexfy python3 -m venv "$INSTALL_DIR/venv"
 
 # 6. Install Python dependencies
 echo "Installing Python dependencies..."
-sudo -u cexfy "$INSTALL_DIR/venv/bin/pip" install --upgrade pip
-sudo -u cexfy "$INSTALL_DIR/venv/bin/pip" install -r "$INSTALL_DIR/requirements.txt"
+sudo -u cexfy HOME=$INSTALL_DIR "$INSTALL_DIR/venv/bin/pip" install --upgrade pip
+sudo -u cexfy HOME=$INSTALL_DIR "$INSTALL_DIR/venv/bin/pip" install -r "$INSTALL_DIR/requirements.txt"
 
 # 7. Create systemd service for the API
 SERVICE_FILE="/etc/systemd/system/cexfy.service"
@@ -95,3 +95,5 @@ echo "=== Installation complete ==="
 echo "cexfy is running as a systemd service."
 echo "Domain configured: $CEXFY_DOMAIN"
 echo "Use: sudo systemctl status cexfy"
+
+
