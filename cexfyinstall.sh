@@ -61,7 +61,7 @@ After=network.target
 [Service]
 WorkingDirectory=$INSTALL_DIR
 ExecStart=$INSTALL_DIR/venv/bin/gunicorn --bind 127.0.0.1:9100 --workers 3 --timeout 60 --forwarded-allow-ips=127.0.0.1 app:app
-ExecReload=/bin/kill -s HUP $MAINPID
+ExecReload=/bin/kill -s HUP \$MAINPID
 Environment="CEXFY_DOMAIN=$CEXFY_DOMAIN"
 Restart=always
 User=cexfy
@@ -95,5 +95,6 @@ echo "=== Installation complete ==="
 echo "cexfy is running as a systemd service."
 echo "Domain configured: $CEXFY_DOMAIN"
 echo "Use: sudo systemctl status cexfy"
+
 
 

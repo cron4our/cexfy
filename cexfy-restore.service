@@ -1,7 +1,7 @@
 [Unit]
 Description=Restore custom nginx configs for cexfy after Hiddify update
-After=hiddify-manager.service hiddify-nginx.service
-PartOf=hiddify-manager.service
+After=hiddify-nginx.service
+PartOf=hiddify-nginx.service
 
 [Service]
 Type=oneshot
@@ -9,4 +9,4 @@ ExecStart=/opt/cexfy/restore-nginx.sh
 
 [Install]
 WantedBy=multi-user.target
-WantedBy=hiddify-manager.service
+WantedBy=hiddify-nginx.service
