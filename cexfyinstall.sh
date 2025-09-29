@@ -31,16 +31,27 @@ sudo mkdir -p "$INSTALL_DIR"
 sudo cp -r ./* "$INSTALL_DIR/"
 sudo chown -R cexfy:cexfy "$INSTALL_DIR"
 
-# 4. Create virtual environment
+# 4. Deploy nginx helpers (if Hiddify is installed)
+sudo chmod +x "$INSTALL_DIR/restore-nginx.sh"
+if [[ -d "/opt/hiddify-manager/nginx" ]]; then
+    echo "Deploying nginx overrides..."
+    if ! sudo "$INSTALL_DIR/restore-nginx.sh"; then
+        echo "Warning: restore-nginx.sh failed; nginx config was not updated" >&2
+    fi
+else
+    echo "Warning: /opt/hiddify-manager/nginx not found, skipping nginx restore"
+fi
+
+# 5. Create virtual environment
 echo "Creating virtual environment..."
 sudo -u cexfy python3 -m venv "$INSTALL_DIR/venv"
 
-# 5. Install Python dependencies
+# 6. Install Python dependencies
 echo "Installing Python dependencies..."
 sudo -u cexfy "$INSTALL_DIR/venv/bin/pip" install --upgrade pip
 sudo -u cexfy "$INSTALL_DIR/venv/bin/pip" install -r "$INSTALL_DIR/requirements.txt"
 
-# 6. Create systemd service
+# 7. Create systemd service for the API
 SERVICE_FILE="/etc/systemd/system/cexfy.service"
 sudo tee "$SERVICE_FILE" > /dev/null <<EOF
 [Unit]
@@ -59,9 +70,26 @@ User=cexfy
 WantedBy=multi-user.target
 EOF
 
-# 7. Enable and start service
+# 8. Install restore helper service
+RESTORE_SERVICE_SOURCE="$INSTALL_DIR/cexfy-restore.service"
+RESTORE_SERVICE_FILE="/etc/systemd/system/cexfy-restore.service"
+RESTORE_SERVICE_INSTALLED=0
+if [[ -f "$RESTORE_SERVICE_SOURCE" ]]; then
+    echo "Installing cexfy-restore.service..."
+    sudo cp "$RESTORE_SERVICE_SOURCE" "$RESTORE_SERVICE_FILE"
+    RESTORE_SERVICE_INSTALLED=1
+else
+    echo "Warning: $RESTORE_SERVICE_SOURCE not found; restore service not installed" >&2
+fi
+
+# 9. Enable and start services
 sudo systemctl daemon-reload
 sudo systemctl enable --now cexfy
+if [[ $RESTORE_SERVICE_INSTALLED -eq 1 ]]; then
+    sudo systemctl enable --now cexfy-restore
+else
+    echo "Reminder: install cexfy-restore.service manually if needed." >&2
+fi
 
 echo "=== Installation complete ==="
 echo "cexfy is running as a systemd service."
